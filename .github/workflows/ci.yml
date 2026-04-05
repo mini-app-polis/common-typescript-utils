@@ -58,10 +58,10 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: Inject secrets from Doppler
-        uses: dopplerhq/secrets-fetch-action@v1.3.0
+        uses: dopplerhq/secrets-fetch-action@v2.0.0
         with:
           doppler-token: ${{ secrets.DOPPLER_TOKEN }}
-          doppler-project: shared-credentials
+          doppler-project: mini-app-polis-ecosystem
           doppler-config: prd
           inject-env-vars: true
 
