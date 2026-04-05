@@ -1,6 +1,6 @@
 {
   "name": "common-typescript-utils",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "packageManager": "pnpm@9.0.0",
   "description": "Shared TypeScript utilities for the MiniAppPolis ecosystem.",
   "type": "module",
@@ -12,7 +12,10 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
@@ -28,7 +31,11 @@
     "url": "https://github.com/mini-app-polis/common-typescript-utils/issues"
   },
   "homepage": "https://github.com/mini-app-polis/common-typescript-utils#readme",
-  "keywords": ["typescript", "utils", "miniapppolis"],
+  "keywords": [
+    "typescript",
+    "utils",
+    "miniapppolis"
+  ],
   "author": "Kaiano Levine",
   "license": "ISC",
   "dependencies": {
