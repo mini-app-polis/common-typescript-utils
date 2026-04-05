@@ -1,0 +1,52 @@
+{
+  "name": "common-typescript-utils",
+  "version": "0.0.0",
+  "description": "Shared TypeScript utilities for the MiniAppPolis ecosystem.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "CHANGELOG.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mini-app-polis/common-typescript-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mini-app-polis/common-typescript-utils/issues"
+  },
+  "homepage": "https://github.com/mini-app-polis/common-typescript-utils#readme",
+  "keywords": ["typescript", "utils", "miniapppolis"],
+  "author": "Kaiano Levine",
+  "license": "ISC",
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.16.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "eslint": "^9.16.0",
+    "semantic-release": "^24.2.9",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.0",
+    "vitest": "^2.1.8"
+  }
+}
