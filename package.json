@@ -1,6 +1,6 @@
 {
   "name": "common-typescript-utils",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "pnpm@9.0.0",
   "description": "Shared TypeScript utilities for the MiniAppPolis ecosystem.",
   "type": "module",

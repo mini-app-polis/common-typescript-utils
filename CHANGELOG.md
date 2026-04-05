@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.0.0...v1.0.1) (2026-04-05)
+
+
+### Bug Fixes
+
+* correct doppler project, upgrade secrets-fetch-action to v2 ([02de9d4](https://github.com/mini-app-polis/common-typescript-utils/commit/02de9d40ff1ae3251b076cb2fef3d80d139a8e45))
+
 # 1.0.0 (2026-04-05)
 
 
