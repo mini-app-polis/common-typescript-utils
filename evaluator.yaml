@@ -1,0 +1,14 @@
+# common-typescript-utils / evaluator.yaml
+# Per-repo evaluation configuration — ecosystem-standards ADR-001, ADR-002
+
+type: shared-library
+
+traits:
+  - logger-primitive
+  # src/logger.ts is the logger implementation — this repo defines the logger
+  # primitive, it cannot consume itself (CD-009, XSTACK-001).
+
+# XSTACK-001 (must depend on common-typescript-utils) covered by shared-library
+# type scoping AND logger-primitive trait.
+# CD-002, CD-010 (observability) covered by shared-library type scoping.
+# TEST-001/002/004 covered by shared-library type scoping.
