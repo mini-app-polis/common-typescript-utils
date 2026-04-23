@@ -6,33 +6,16 @@ context around them, and their consequences.
 
 ## Format
 
-Each ADR is a markdown file named `NNNN-title-in-kebab-case.md` where
-`NNNN` is a zero-padded sequence number starting at `0001`.
+Each ADR is a markdown file named `ADR-NNN-short-slug.md` where `NNN`
+is a zero-padded three-digit sequence number starting at `001`. This
+matches the ecosystem-standards DOC-005 specification.
 
-## Template
-
-```markdown
-# NNNN. Title of the decision
-
-Date: YYYY-MM-DD
-
-## Status
-
-Proposed | Accepted | Superseded by [NNNN](./NNNN-other.md)
-
-## Context
-
-What is the issue that we're seeing that is motivating this decision?
-
-## Decision
-
-What is the change that we're actually proposing or doing?
-
-## Consequences
-
-What becomes easier or more difficult to do because of this change?
-```
+Each ADR uses three sections: **Context** (what forces motivated the
+decision), **Decision** (what change is being made), and
+**Consequences** (what becomes easier or harder).
 
 ## Index
 
-No decisions recorded yet.
+- [ADR-001: Web Crypto for Clerk JWT verification](./ADR-001-web-crypto-for-clerk-jwt.md)
+- [ADR-002: Logger interface mirrors common-python-utils](./ADR-002-logger-mirrors-python.md)
+- [ADR-003: Canonical API response envelope](./ADR-003-api-response-envelope.md)
