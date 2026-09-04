@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
+    // @types/node is required by src/logger.ts (process.env) and must be
+    // declared. TypeScript 6 no longer auto-includes node_modules/@types,
+    // so without this the build config -- which excludes the test files that
+    // were transitively pulling in node types via vitest -- loses `process`.
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
