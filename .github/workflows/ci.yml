@@ -7,6 +7,18 @@ on:
     branches: [main]
 
 jobs:
+  # SEC-002 through SEC-005. Delegates to the fleet's shared security
+  # workflow: gitleaks over full history, pnpm audit against the resolved
+  # dependency set, semgrep, and a CycloneDX SBOM retained as a build
+  # artifact. The steps live in mini-app-polis/.github so the pinned tool
+  # versions and the gating decisions are in one place; see that repo's
+  # README for the inputs.
+  security:
+    uses: mini-app-polis/.github/.github/workflows/security.yml@v1
+    with:
+      language: typescript
+      package-manager: pnpm
+
   ci:
     runs-on: ubuntu-latest
     steps:
@@ -22,23 +34,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # SEC-002: Secret scanning on pull-request diffs using gitleaks.
-      # Runs early: fast, deterministic, and a leaked credential should stop
-      # the build before anything else is worth looking at.
-      - name: Scan for secrets (PR diffs)
-        if: github.event_name == 'pull_request'
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          source: diff
-          verbose: true
-
-      # SEC-002: Full gitleaks scan on push to main
-      - name: Scan for secrets (full history)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: gitleaks/gitleaks-action@v2
-        with:
-          verbose: true
-
       - name: Typecheck
         run: pnpm typecheck
 
@@ -51,29 +46,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # SEC-003: Dependency vulnerability scanning, split by blast radius.
-      #
-      # These run last because `pnpm audit` calls the npm registry over the
-      # network on every invocation. A registry timeout is not a reason to
-      # withhold typecheck, lint and test results.
-      #
-      # Hard gate on runtime dependencies only. This package publishes dist/
-      # with zod as its sole runtime dependency, so anything flagged here
-      # actually reaches consumers and is worth blocking a release for.
-      - name: Audit runtime dependencies
-        run: pnpm audit --prod --audit-level=moderate
-
-      # Report-only on the full tree. Dev-only findings arrive through eslint
-      # and semantic-release, ship to nobody, and are frequently not fixable
-      # by upgrading — current eslint still resolves a flagged brace-expansion.
-      # Failing merges on them would leave CI permanently red, which teaches
-      # everyone to ignore it. Surfaced here to be read, not to gate.
-      - name: Audit all dependencies (informational)
-        continue-on-error: true
-        run: pnpm audit --audit-level=moderate
-
   release:
-    needs: ci
+    needs: [ci, security]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
