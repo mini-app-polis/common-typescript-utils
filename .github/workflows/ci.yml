@@ -99,9 +99,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install semantic-release plugins
-        run: pnpm add --save-dev @semantic-release/changelog @semantic-release/git @semantic-release/github @semantic-release/npm @semantic-release/commit-analyzer @semantic-release/release-notes-generator
-
       - name: Build
         run: pnpm build
 

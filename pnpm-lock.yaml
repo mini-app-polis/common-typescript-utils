@@ -38,13 +38,13 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(semantic-release@24.2.9(typescript@6.0.3))
       '@semantic-release/github':
-        specifier: ^12.0.6
+        specifier: ^12.0.9
         version: 12.0.9(semantic-release@24.2.9(typescript@6.0.3))
       '@semantic-release/npm':
         specifier: ^13.1.5
         version: 13.1.5(semantic-release@24.2.9(typescript@6.0.3))
       '@semantic-release/release-notes-generator':
-        specifier: ^14.1.0
+        specifier: ^14.1.1
         version: 14.1.1(semantic-release@24.2.9(typescript@6.0.3))
       '@types/node':
         specifier: ^22.10.2
