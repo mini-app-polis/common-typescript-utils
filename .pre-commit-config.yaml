@@ -1,0 +1,7 @@
+repos:
+  # SEC-001: Gitleaks scans for secrets before commit, catching them locally
+  # rather than after they hit the repository or CI.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
