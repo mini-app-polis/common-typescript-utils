@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.0.2...v1.1.0) (2026-09-04)
+
+
+### Features
+
+* **auth:** validate the Clerk issuer in verifyClerkToken ([1be7432](https://github.com/mini-app-polis/common-typescript-utils/commit/1be7432b6e3768d81b49085117aa3a33f0683e89))
+
 ## [1.0.2](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.0.1...v1.0.2) (2026-09-04)
 
 
