@@ -58,7 +58,22 @@ async function importKeyForKid(jwksUrl: string, kid: string): Promise<CryptoKey>
   return key;
 }
 
-export async function verifyClerkToken(token: string, jwksUrl: string): Promise<ClerkPayload> {
+/**
+ * Verify a Clerk session JWT.
+ *
+ * `expectedIssuer`, when given, is checked against the token's `iss`
+ * claim. Without it a signature check alone proves only that *some*
+ * issuer whose keys are in this JWKS signed the token — which is the
+ * right answer for a single-tenant JWKS and the wrong one the moment a
+ * key set serves more than one issuer, or a JWKS URL is misconfigured
+ * to point at someone else's. Optional so existing callers keep
+ * working, and every caller that knows its issuer should pass it.
+ */
+export async function verifyClerkToken(
+  token: string,
+  jwksUrl: string,
+  expectedIssuer?: string
+): Promise<ClerkPayload> {
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Malformed token");
 
@@ -78,6 +93,11 @@ export async function verifyClerkToken(token: string, jwksUrl: string): Promise<
   const exp = payload.exp;
   if (typeof exp === "number" && Date.now() / 1000 >= exp) {
     throw new Error("Token expired");
+  }
+  if (expectedIssuer) {
+    if (payload.iss !== expectedIssuer) {
+      throw new Error("Untrusted issuer");
+    }
   }
   const sub = payload.sub;
   if (typeof sub !== "string" || !sub) throw new Error("Invalid subject");
