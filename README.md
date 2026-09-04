@@ -88,6 +88,8 @@ npm run build
 
 Releases are automated via semantic-release on push to `main`. Requires `NPM_TOKEN` and `GITHUB_TOKEN` secrets.
 
+`NPM_TOKEN` comes from Doppler (`mini-app-polis-ecosystem` / `prd`) and **expires** — npm removed non-expiring tokens in November 2025, so a failed release is more often a lapsed credential than a broken build. See [`docs/npm-package-publishing.md`](docs/npm-package-publishing.md) for the failure signatures, the exact token settings, and the trusted-publishing migration that removes the token entirely.
+
 ```
 feat:     → minor bump
 fix:      → patch bump

@@ -77,6 +77,22 @@ jobs:
           doppler-config: prd
           inject-env-vars: true
 
+      # An empty NPM_TOKEN and an expired one both surface as the same
+      # opaque `401 Unauthorized - GET /-/whoami` from npm, which points
+      # at the registry when the problem may be that Doppler returned
+      # nothing. Separate the two here, before semantic-release runs.
+      # Length only -- never the value.
+      - name: Verify NPM_TOKEN was injected
+        env:
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NPM_TOKEN:-}" ]; then
+            echo "::error::NPM_TOKEN is empty after the Doppler step. Check that the secret exists in project mini-app-polis-ecosystem, config prd, under exactly that name, and that DOPPLER_TOKEN is valid. This is not an npm problem."
+            exit 1
+          fi
+          echo "NPM_TOKEN injected (${#NPM_TOKEN} chars). If npm still returns 401, the token itself is expired, revoked, or lacks publish rights."
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
