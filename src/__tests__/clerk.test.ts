@@ -64,6 +64,55 @@ describe("verifyClerkToken", () => {
     vi.restoreAllMocks();
   });
 
+  // Signing-key rotation. The provider retires a key and starts signing with
+  // a new one; tokens then arrive with a kid the cached JWKS has never seen.
+  // Serving the stale cache back means every authenticated request 401s until
+  // the hour-long TTL lapses, so an unknown kid must force one refetch.
+  it("refetches the JWKS when a token arrives with an unknown kid", async () => {
+    const before = await mint({ sub: "user_old", exp: future(), iss: "https://clerk.test" });
+    const after = await mint({ sub: "user_new", exp: future(), iss: "https://clerk.test" });
+
+    // First response is the pre-rotation key set; every later one is post-rotation.
+    let call = 0;
+    const fetchMock = vi.fn(async () => {
+      const body = call++ === 0 ? before.jwks : after.jwks;
+      return { ok: true, json: async () => body } as unknown as Response;
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.resetModules();
+    const verifyClerkToken = (await import("../auth.js")).verifyClerkToken;
+
+    // Warm the cache with the pre-rotation set.
+    expect((await verifyClerkToken(before.token, JWKS_URL)).sub).toBe("user_old");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    // Post-rotation token: its kid is absent from the cached set, so the
+    // verifier must go back to the JWKS endpoint rather than reject it.
+    expect((await verifyClerkToken(after.token, JWKS_URL)).sub).toBe("user_new");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  // The same path is what a forged token exercises, so it must not let an
+  // attacker drive one outbound request per bad token.
+  it("does not refetch the JWKS for every token carrying an unknown kid", async () => {
+    const good = await mint({ sub: "user_1", exp: future(), iss: "https://clerk.test" });
+    const forged = await mint({ sub: "attacker", exp: future(), iss: "https://clerk.test" });
+
+    const fetchMock = vi.fn(async () => ({ ok: true, json: async () => good.jwks }) as unknown as Response);
+    vi.stubGlobal("fetch", fetchMock);
+    vi.resetModules();
+    const verifyClerkToken = (await import("../auth.js")).verifyClerkToken;
+
+    await verifyClerkToken(good.token, JWKS_URL);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    for (let i = 0; i < 5; i++) {
+      await expect(verifyClerkToken(forged.token, JWKS_URL)).rejects.toThrow(/No JWK for kid/);
+    }
+    // One refetch on the first unknown kid, then the floor holds.
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("accepts a well-formed token and returns its subject", async () => {
     const { token, jwks } = await mint({ sub: "user_1", exp: future(), iss: "https://clerk.test" });
     const verifyClerkToken = await freshVerifier(jwks);

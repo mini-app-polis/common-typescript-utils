@@ -5,10 +5,17 @@ export type ClerkPayload = {
 
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
+// Floor between forced JWKS refetches for one URL. An unknown `kid` triggers
+// a refetch (see importKeyForKid), and an attacker can mint unlimited tokens
+// carrying unknown kids, so without a floor that path turns every bad token
+// into an outbound request to the identity provider.
+const REFETCH_FLOOR_MS = 60 * 1000;
+
 type Jwk = JsonWebKey & { kid?: string };
 type JwkSet = { keys: Jwk[] };
 
-let cache: { jwks: JwkSet; expiry: number } | null = null;
+const jwksCache = new Map<string, { jwks: JwkSet; fetchedAt: number }>();
+const forcedRefetchAt = new Map<string, number>();
 const keyCache = new Map<string, { key: CryptoKey; expiry: number }>();
 
 function base64UrlDecode(str: string): Uint8Array {
@@ -26,15 +33,16 @@ function decodePayload(token: string): Record<string, unknown> {
   return JSON.parse(json) as Record<string, unknown>;
 }
 
-async function fetchJwks(jwksUrl: string): Promise<JwkSet> {
+async function fetchJwks(jwksUrl: string, force = false): Promise<JwkSet> {
   const now = Date.now();
-  if (cache && now < cache.expiry) return cache.jwks;
+  const cached = jwksCache.get(jwksUrl);
+  if (!force && cached && now - cached.fetchedAt < CACHE_TTL_MS) return cached.jwks;
 
   const res = await fetch(jwksUrl);
   if (!res.ok) throw new Error(`JWKS fetch failed: ${res.status}`);
   const jwks = (await res.json()) as JwkSet;
   if (!jwks.keys?.length) throw new Error("No keys in JWKS");
-  cache = { jwks, expiry: now + CACHE_TTL_MS };
+  jwksCache.set(jwksUrl, { jwks, fetchedAt: now });
   return jwks;
 }
 
@@ -43,8 +51,24 @@ async function importKeyForKid(jwksUrl: string, kid: string): Promise<CryptoKey>
   const cached = keyCache.get(kid);
   if (cached && now < cached.expiry) return cached.key;
 
-  const jwks = await fetchJwks(jwksUrl);
-  const jwk = jwks.keys.find((k) => k.kid === kid);
+  let jwks = await fetchJwks(jwksUrl);
+  let jwk = jwks.keys.find((k) => k.kid === kid);
+  if (!jwk) {
+    // An unknown kid means the key set moved on. Identity providers rotate
+    // signing keys without notice, and the cached copy can be up to
+    // CACHE_TTL_MS stale, so serving it back is how a rotation turns into an
+    // hour of 401s on every authenticated request. Refetch once -- rate
+    // limited, because unknown kids are also what a forged token looks like.
+    // Floor on the forced refetch specifically, not on the last fetch of any
+    // kind: a rotation usually lands while the cache is freshly warm, so
+    // gating on cache age would block the one refetch that fixes it.
+    const last = forcedRefetchAt.get(jwksUrl);
+    if (last === undefined || now - last >= REFETCH_FLOOR_MS) {
+      forcedRefetchAt.set(jwksUrl, now);
+      jwks = await fetchJwks(jwksUrl, true);
+      jwk = jwks.keys.find((k) => k.kid === kid);
+    }
+  }
   if (!jwk) throw new Error(`No JWK for kid ${kid}`);
 
   const key = await crypto.subtle.importKey(
