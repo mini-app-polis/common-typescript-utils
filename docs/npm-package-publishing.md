@@ -45,8 +45,9 @@ Two things follow from this shape, and both matter when it breaks:
 | Symptom | Cause | Go to |
 |---|---|---|
 | `NPM_TOKEN is empty after the Doppler step` | Secret missing, renamed, or `DOPPLER_TOKEN` itself expired | §3 |
-| `401 Unauthorized - GET /-/whoami` | Token expired, revoked, wrongly scoped — or the 2FA interaction in §5 | §4 |
+| `401 Unauthorized - GET /-/whoami` | Token expired, revoked, or wrongly scoped | §4 |
 | `EINVALIDNPMTOKEN` | Always downstream of the 401 above. Not a separate fault. | §4 |
+| `403 Forbidden - PUT ...` naming `bypass 2fa` | Token authenticates but lacks **Bypass 2FA**. `whoami` passes; only the final publish is refused. | §5 |
 | `Variable $owner of type String! was provided invalid value` | `@semantic-release/github`'s *fail* handler crashing while filing an issue about the real error | ignore |
 
 That last row costs people time. It appears **last** in the log, where
@@ -87,7 +88,7 @@ Create at npmjs.com → **Access Tokens** → **Generate New Token**:
 |---|---|---|
 | Name | `<package>-release` | Identifies it at rotation time |
 | Expiration | The longest offered; record the date | There is no non-expiring option |
-| Bypass 2FA | On, if 2FA is enabled on the account or package | semantic-release cannot answer an interactive challenge. Read §5 first. |
+| Bypass 2FA | **On — required** | Verified 2026-09-04: without it, `publish` returns 403 even though `whoami` succeeds. See §5. |
 | IP Allowlist | **Empty** | GitHub runners have dynamic IPs. An allowlist here fails intermittently and reads as an auth bug. |
 | Packages & Scopes | *Only select packages* → the one package, **Read and write** | Write is required to publish. Never grant "All packages". |
 | Organizations | **No access** | Org permissions cover org settings, teams and users only — they play no part in publishing. |
@@ -107,9 +108,9 @@ in Doppler under `NPM_TOKEN`, project `mini-app-polis-ecosystem`, config
 
 ---
 
-## §5 — The Bypass 2FA caveat
+## §5 — Bypass 2FA is required; `whoami` is not affected
 
-**Unconfirmed. Check it before assuming a rotation will help.**
+**Settled 2026-09-04 by a live release run.**
 
 npm's documentation states:
 
@@ -117,19 +118,30 @@ npm's documentation states:
 > account-identity or account-governance actions. Those actions always
 > require an interactive 2FA challenge.
 
-npm does not publish a list of which commands are "account-identity"
-actions, and `npm whoami` is not named either way. But it queries the
-account identity endpoint, and `@semantic-release/npm` calls it on every
-run before publishing.
+That raised a reasonable worry, since `@semantic-release/npm` calls
+`npm whoami` before publishing: if `whoami` counted as an account-identity
+action, no token would clear `verifyConditions` on a 2FA account. **It
+does not.** Both halves were observed directly:
 
-If `whoami` is covered by that restriction, then on an account with 2FA
-enabled **a freshly minted token will fail exactly like the expired one**,
-and any amount of rotation is wasted effort.
+- **`npm whoami` succeeds** with a granular token that does *not* have
+  Bypass 2FA. `verifyConditions` completed and printed the account name.
+- **`npm publish` is refused without it:**
 
-The test that settles it is the `npm whoami` check in §4. A 401 from a
-brand-new, correctly-scoped token is the signal: stop rotating and go to
-§6. Record the result here when someone establishes it, so the next
-person inherits an answer rather than this paragraph.
+  ```
+  403 Forbidden - PUT https://registry.npmjs.org/<package>
+  Two-factor authentication or granular access token with bypass 2fa
+  enabled is required to publish packages.
+  ```
+
+So on an account with 2FA enabled, Bypass 2FA is **mandatory for this
+flow**, not conditional on anything. The August 2026 restriction does not
+reach it.
+
+Worth knowing how late this fails. `whoami` passes, commits are analysed,
+the next version is computed, the package is built and packed — and only
+the final `PUT` is rejected. A token missing this one checkbox looks
+completely healthy until the last second of the release, and the 401 and
+403 paths are easy to conflate because both read as "token problem."
 
 ---
 
