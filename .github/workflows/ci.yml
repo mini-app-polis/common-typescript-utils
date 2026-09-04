@@ -107,6 +107,14 @@ jobs:
 
       - name: Release
         env:
+          # @semantic-release/github reads `GH_TOKEN || GITHUB_TOKEN`
+          # (lib/resolve-config.js), so GH_TOKEN wins whenever it is set.
+          # The Doppler step above runs with inject-env-vars and puts a
+          # long-lived PAT in GH_TOKEN, which then shadowed the token on the
+          # next line and 403'd on POST /releases. Doppler is here for
+          # NPM_TOKEN only; pin both names to the job's own scoped token so
+          # the release never depends on a PAT's repo grants.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
         run: npx semantic-release
