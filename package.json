@@ -56,5 +56,30 @@
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.0",
     "vitest": "^3.2.7"
+  },
+  "pnpm": {
+    "_comment": [
+      "Every entry here closes a finding from the SEC-003 audit against a",
+      "transitive of eslint, semantic-release or vitest. None of them ship:",
+      "this package publishes dist/ with zod as its only runtime dependency.",
+      "They are pinned rather than waiting on upstream because the direct",
+      "dependencies are already current -- eslint 9.39.4 still resolves a",
+      "flagged brace-expansion, so bumping it would not help.",
+      "Each version below is the fixed version named by the advisory.",
+      "Remove an entry once the upstream range moves past it on its own."
+    ],
+    "overrides": {
+      "@humanfs/node": "^0.16.8",
+      "brace-expansion@1": "^1.1.18",
+      "brace-expansion@2": "^2.1.4",
+      "brace-expansion@5": "^5.0.9",
+      "esbuild": "^0.25.0",
+      "js-yaml@4": "^4.3.1",
+      "nanoid@3": "^3.3.18",
+      "postcss": "^8.5.23",
+      "undici@6": "^6.28.0",
+      "undici@7": "^7.29.0",
+      "vite": "^6.4.3"
+    }
   }
 }
