@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.2.0...v1.2.1) (2026-09-04)
+
+
+### Bug Fixes
+
+* **build:** declare @types/node so the build config keeps `process` ([b051ee7](https://github.com/mini-app-polis/common-typescript-utils/commit/b051ee71c582d19562ea95a4976c9a90e29b407a)), closes [#5](https://github.com/mini-app-polis/common-typescript-utils/issues/5)
+* **git:** never three-way merge a lockfile ([6433966](https://github.com/mini-app-polis/common-typescript-utils/commit/643396674a74d91462fc3e0a5a017ba151b276ba))
+
 # [1.2.0](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.1.0...v1.2.0) (2026-09-04)
 
 
