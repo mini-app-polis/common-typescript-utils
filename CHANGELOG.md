@@ -1,3 +1,13 @@
+## [1.0.2](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.0.1...v1.0.2) (2026-09-04)
+
+
+### Bug Fixes
+
+* **ci:** delegate security to the shared fleet workflow ([c2e0af6](https://github.com/mini-app-polis/common-typescript-utils/commit/c2e0af630caf38263022d5bea528a3097b462669))
+* **deps:** upgrade vitest to 3.2.7 and split CI audit by blast radius ([ea35bd5](https://github.com/mini-app-polis/common-typescript-utils/commit/ea35bd5d73a56f550c26a18319ae02c817eb6f77))
+* **deps:** upgrade vitest to 3.2.7 for GHSA-5xrq-8626-4rwp ([85389f8](https://github.com/mini-app-polis/common-typescript-utils/commit/85389f88e4bcb3f63989e01873cf27f83eaa3f50))
+* **security:** add pre-commit hooks and security scanning ([315eca9](https://github.com/mini-app-polis/common-typescript-utils/commit/315eca90f302d7058ad10dee89c764d963a80834))
+
 ## [1.0.1](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.0.0...v1.0.1) (2026-04-05)
 
 
