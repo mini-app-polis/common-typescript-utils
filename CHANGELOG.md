@@ -1,3 +1,11 @@
+## [1.2.2](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.2.1...v1.2.2) (2026-09-05)
+
+
+### Bug Fixes
+
+* **auth:** name a missing WebCrypto global instead of failing as a bad token ([c15cbb7](https://github.com/mini-app-polis/common-typescript-utils/commit/c15cbb757f83e0983bfb32c3cb0e8f089e4ceaae))
+* **auth:** refetch the JWKS when a token carries an unknown kid ([f7b4f30](https://github.com/mini-app-polis/common-typescript-utils/commit/f7b4f30f7ce18e25d9378dd95f83006a061d2206))
+
 ## [1.2.1](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.2.0...v1.2.1) (2026-09-04)
 
 
