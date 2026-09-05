@@ -9,9 +9,12 @@ credential on this path now has a deadline, so this failure is not an
 incident — it is a scheduled event, and the only question is whether the
 next person recognises it in two minutes or two hours.
 
-Python libraries are not in scope. They are pulled from git and never
-published to PyPI, so they have no registry credential at all. See the
-exclusion logic in `mini-app-polis/.github` `security.yml`.
+Python libraries are not in scope here, but no longer for the reason this
+section used to give. They are published to PyPI as of September 2026, over
+trusted publishing rather than a stored token — see
+`common-python-utils/docs/pypi-package-publishing.md`. The exclusion logic
+in `mini-app-polis/.github` `security.yml` still assumes they are not
+published and needs revisiting.
 
 ---
 
