@@ -165,3 +165,17 @@ describe("verifyClerkToken", () => {
     await expect(verifyClerkToken("not.a.jwt.really", JWKS_URL)).rejects.toThrow(/Malformed/);
   });
 });
+
+describe("verifyClerkToken runtime preflight", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  // A runtime without WebCrypto must say so. Left unnamed, it surfaces to
+  // every caller as a rejected token and 401s the entire API while /health
+  // stays green.
+  it("names a missing WebCrypto global instead of failing as a bad token", async () => {
+    const { token, jwks } = await mint({ sub: "user_1", exp: future(), iss: "https://clerk.test" });
+    const verifyClerkToken = await freshVerifier(jwks);
+    vi.stubGlobal("crypto", {});
+    await expect(verifyClerkToken(token, JWKS_URL)).rejects.toThrow(/WebCrypto unavailable/);
+  });
+});

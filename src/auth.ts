@@ -98,6 +98,19 @@ export async function verifyClerkToken(
   jwksUrl: string,
   expectedIssuer?: string
 ): Promise<ClerkPayload> {
+  // Node exposed globalThis.crypto only behind --experimental-global-webcrypto
+  // until v19. On an older runtime the calls below throw ReferenceError, which
+  // every caller catches as "the token is bad" and answers 401 -- so a runtime
+  // too old to verify anything looks identical to ordinary unauthenticated
+  // traffic, on every request, with a healthy service. Name it instead.
+  if (typeof globalThis.crypto?.subtle === "undefined") {
+    throw new Error(
+      "WebCrypto unavailable: globalThis.crypto.subtle is undefined. " +
+        "Node 19+ is required (18 needs --experimental-global-webcrypto). " +
+        "This is a runtime fault, not an invalid token."
+    );
+  }
+
   const parts = token.split(".");
   if (parts.length !== 3) throw new Error("Malformed token");
 
