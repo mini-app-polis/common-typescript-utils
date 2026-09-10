@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.2.2...v1.2.3) (2026-09-10)
+
+
+### Bug Fixes
+
+* **deps:** upgrade vitest to 4.1.11 past GHSA-82fw-gwwq-j7x9 ([cd4c06e](https://github.com/mini-app-polis/common-typescript-utils/commit/cd4c06ef3868aa3b88e33b1bfe7a8fc1314a9381))
+
 ## [1.2.2](https://github.com/mini-app-polis/common-typescript-utils/compare/v1.2.1...v1.2.2) (2026-09-05)
 
 
