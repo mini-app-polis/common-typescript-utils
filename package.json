@@ -50,12 +50,12 @@
     "@semantic-release/npm": "^13.1.5",
     "@semantic-release/release-notes-generator": "^14.1.1",
     "@types/node": "^22.10.2",
-    "@vitest/coverage-v8": "^3.2.7",
+    "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^10.9.1",
     "semantic-release": "^24.2.9",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.18.0",
-    "vitest": "^3.2.7"
+    "vitest": "^4.1.11"
   },
   "pnpm": {
     "_comment": [
