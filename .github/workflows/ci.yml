@@ -2,9 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # SEC-002 through SEC-005. Delegates to the fleet's shared security
@@ -22,7 +26,7 @@ jobs:
     with:
       language: typescript
 
-  ci:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -31,7 +35,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: "22"
           cache: pnpm
 
       - name: Install dependencies
@@ -50,7 +54,7 @@ jobs:
         run: pnpm build
 
   release:
-    needs: [ci, security]
+    needs: [test, security]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -68,7 +72,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: "22"
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
